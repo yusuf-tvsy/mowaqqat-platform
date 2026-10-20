@@ -197,7 +197,7 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={
     if(url.pathname==='/_portal/health')return Response.json({status:'ok',service:'kader-portal',release:PORTAL_RELEASE},{headers:{'cache-control':'no-store'}});
     const rsc=request.headers.has('rsc')||request.headers.has('next-router-state-tree');
     const legacyRoot=url.pathname==='/'&&['1','legacy'].includes(url.searchParams.get('workspace'));
-    const root=false; // The apex serves the existing management workspace; portal remains at /mowaqqat/.
+    const root=url.pathname==='/'&&!rsc&&!legacyRoot;
     if(!root&&url.pathname!=='/mowaqqat'&&!url.pathname.startsWith('/mowaqqat/'))return legacy(request);
     if(url.pathname==='/mowaqqat')return new Response(null,{status:308,headers:{location:'/mowaqqat/'+url.search,'cache-control':'no-store'}});
     if(!['GET','HEAD','POST','PUT','PATCH','DELETE','OPTIONS'].includes(request.method))return portalFailure('Method not allowed',405);
