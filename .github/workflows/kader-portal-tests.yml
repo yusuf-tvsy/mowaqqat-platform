@@ -1,0 +1,28 @@
+name: Kader portal gateway checks
+
+on:
+  push:
+    branches:
+      - kader-qa-hardening-20261030
+      - kader-apex-routing-20261020
+  pull_request:
+    paths:
+      - 'kader-apex/**'
+      - '.github/workflows/kader-portal-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gateway:
+    name: Regression tests (Node 22)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run portal gateway tests
+        run: node --test kader-apex/gateway.test.mjs
