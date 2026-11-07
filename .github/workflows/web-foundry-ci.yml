@@ -1,0 +1,39 @@
+name: Web Foundry level 6 checks (no deploy)
+on:
+  push:
+    branches:
+      - web-foundry-mvp-20261107
+    paths:
+      - 'web_foundry/**'
+      - '.github/workflows/web-foundry-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'web_foundry/**'
+      - '.github/workflows/web-foundry-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline unit tests
+        run: python -m unittest discover -s web_foundry/tests -v
+      - name: Generate a sample Arabic site from the template
+        run: python web_foundry/foundry.py init --slug demo-site --title 'موقع تجريبي' --out /tmp/web-foundry-demo
+      - name: Verify generated static site
+        run: python web_foundry/foundry.py audit --site /tmp/web-foundry-demo
+      - name: Verify production is blocked without independent evidence
+        shell: bash
+        run: |
+          set +e
+          python web_foundry/foundry.py gate --manifest /tmp/web-foundry-demo/project.json
+          result=$?
+          test "$result" -eq 2
