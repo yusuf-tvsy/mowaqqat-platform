@@ -1,0 +1,29 @@
+name: Orphan research preview static QA
+on:
+  pull_request:
+    branches:
+      - orphan-center-public-preview
+    paths:
+      - 'index.html'
+      - 'assets/**'
+      - 'research/**'
+      - 'robots.txt'
+      - 'tools/check_site.py'
+      - 'tests/test_check_site.py'
+      - '.github/workflows/orphan-public-preview-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test the audit tool on isolated fixtures
+        run: python -m unittest discover -s tests -p 'test_check_site.py' -v
+      - name: Audit public preview source
+        run: python tools/check_site.py --root .
