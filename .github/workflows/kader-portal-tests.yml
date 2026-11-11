@@ -1,0 +1,41 @@
+name: Kader portal and recovery checks
+
+on:
+  push:
+    branches:
+      - kader-qa-hardening-20261030
+      - kader-apex-routing-20261020
+  pull_request:
+    paths:
+      - 'kader-apex/**'
+      - 'operations/**'
+      - '.github/workflows/kader-portal-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gateway:
+    name: Gateway regression tests (Node 22)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run portal gateway tests
+        run: node --test kader-apex/gateway.test.mjs
+
+  recovery:
+    name: Backup safety tests (Python 3.12)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run isolated SQLite backup tests
+        run: python -m unittest discover -s operations -p 'test_sqlite_backup.py' -v
