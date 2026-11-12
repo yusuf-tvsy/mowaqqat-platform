@@ -21,21 +21,25 @@ test('apex displays the corrected central portal with no host redirect',async()=
   assert.match(html,/<base href="\/mowaqqat\/">/);
   assert.match(html,/<meta name="kader-base-path" content="\/mowaqqat">/);
 });
-test('archive and its server-rendered navigation preserve the original workspace',async()=>{
+test('retired workspace queries stay on the authenticated central portal',async()=>{
   for(const query of ['?workspace=legacy','?workspace=1']){
     const {handler,calls}=fixture();const response=await handler(new Request('https://kader.media/'+query));
     assert.equal(response.status,200);assert.equal(response.headers.get('location'),null);
-    assert.equal(calls[0].url,'https://media90.lemonygleam8.chatgpt.site/'+query);
-    assert.doesNotMatch(await response.text(),/kader-base-path/);
+    assert.equal(calls[0].url,'https://mowaqqat-full-production.up.railway.app/mowaqqat/');
+    assert.match(await response.text(),/kader-base-path/);
   }
   const {handler,calls}=fixture();
   await handler(new Request('https://kader.media/?workspace=legacy',{headers:{rsc:'1'}}));
-  assert.equal(calls[0].url,'https://media90.lemonygleam8.chatgpt.site/?workspace=legacy');
+  assert.equal(calls[0].url,'https://mowaqqat-full-production.up.railway.app/mowaqqat/');
 });
-test('login and existing APIs stay on the same public host',async()=>{
-  for(const path of ['/login','/api/health','/_next/static/ui.js']){
+test('central API alias uses the native service and retired routes are rejected',async()=>{
+  for(const path of ['/api/health']){
     const {handler,calls}=fixture();const response=await handler(new Request('https://kader.media'+path));
-    assert.equal(response.status,200);assert.equal(calls[0].url,'https://media90.lemonygleam8.chatgpt.site'+path);
+    assert.equal(response.status,200);assert.equal(calls[0].url,'https://mowaqqat-full-production.up.railway.app/mowaqqat'+path);
+  }
+  for(const path of ['/login','/_next/static/ui.js']){
+    const {handler,calls}=fixture();const response=await handler(new Request('https://kader.media'+path));
+    assert.equal(response.status,404);assert.equal(calls.length,0);
   }
 });
 test('corrected portal and versioned assets remain available under apex',async()=>{
@@ -44,14 +48,14 @@ test('corrected portal and versioned assets remain available under apex',async()
     assert.equal(response.status,200);assert.equal(calls[0].url,'https://mowaqqat-full-production.up.railway.app'+path);
   }
 });
-test('session response remains host-only and secure',async()=>{
-  const {handler}=fixture();const response=await handler(new Request('https://kader.media/?workspace=legacy'));
-  const cookie=response.headers.get('set-cookie');assert.doesNotMatch(cookie,/Domain=/i);
-  assert.match(cookie,/Secure/i);assert.match(cookie,/HttpOnly/i);
+test('unrecognized upstream cookies are not forwarded',async()=>{
+  const {handler}=fixture();const response=await handler(new Request('https://kader.media/'));
+  const cookie=response.headers.get('set-cookie');
+  assert.equal(cookie,null);
   assert.match(response.headers.get('cache-control'),/no-store/);
 });
-test('root login uses the portal API path while legacy login remains available',async()=>{
-  for(const [path,target] of [['/mowaqqat/api/auth/login','https://mowaqqat-full-production.up.railway.app/mowaqqat/api/auth/login'],['/api/auth/login','https://media90.lemonygleam8.chatgpt.site/api/auth/login']]){
+test('both login paths use the native authenticated backend',async()=>{
+  for(const [path,target] of [['/mowaqqat/api/auth/login','https://mowaqqat-full-production.up.railway.app/mowaqqat/api/auth/login'],['/api/auth/login','https://mowaqqat-full-production.up.railway.app/mowaqqat/api/auth/login']]){
     const {handler,calls}=fixture();
     const response=await handler(new Request('https://kader.media'+path,{method:'POST',headers:{origin:'https://kader.media','content-type':'application/json'},body:'{"fixture":true}'}));
     assert.equal(response.status,200);assert.equal(calls[0].url,target);

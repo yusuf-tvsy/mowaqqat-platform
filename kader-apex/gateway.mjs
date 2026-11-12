@@ -1,3 +1,6 @@
+import {readFileSync} from 'node:fs';
+import {repairPortalAsset,UI_REPAIR_REV,UI_REPAIR_CSS_PATH} from './ui-repair.mjs';
+const UI_REPAIR_CSS=readFileSync(new URL('./ui-repair.css',import.meta.url),'utf8');
 export const PORTAL_RELEASE='2.8.0';
 export const PORTAL_UPSTREAM='https://mowaqqat-full-production.up.railway.app';
 const UI_FIX_PATH='/_kader/ui-correction-20261110.css';
@@ -97,8 +100,10 @@ body[data-kader-ui] :is(.panel,.card,.stat-card) { border-color: var(--kader-a11
 `;
 const UI_FIX_LINK=`<link rel="stylesheet" href="${UI_FIX_PATH}" data-kader-ui-fix="${UI_FIX_REV}">`;
 function attachUiFix(html){
-  if(typeof html!=='string'||html.includes(`data-kader-ui-fix="${UI_FIX_REV}"`))return html;
-  return html.replace(/<\/head>/i,UI_FIX_LINK+'</head>');
+  if(typeof html!=='string')return html;
+  if(!html.includes(`data-kader-ui-fix="${UI_FIX_REV}"`))html=html.replace(/<\/head>/i,UI_FIX_LINK+'</head>');
+  if(!html.includes(`data-kader-ui-repair="${UI_REPAIR_REV}"`))html=html.replace(/<\/head>/i,`<link rel="stylesheet" href="${UI_REPAIR_CSS_PATH}" data-kader-ui-repair="${UI_REPAIR_REV}"></head>`);
+  return html;
 }
 const PORTAL_MAX_BODY=52*1024*1024;
 const PORTAL_SAFE=new Set(['GET','HEAD','OPTIONS']);
@@ -113,6 +118,10 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={
     const url=new URL(request.url);
     if(!hosts.has(url.hostname.toLowerCase()))return portalFailure('Unrecognized host',421);
     if(url.pathname==='/_portal/health')return Response.json({status:'ok',service:'kader-portal',release:PORTAL_RELEASE},{headers:{'cache-control':'no-store'}});
+    if(url.pathname===UI_REPAIR_CSS_PATH){
+      if(!['GET','HEAD'].includes(request.method))return portalFailure('Method not allowed',405);
+      return new Response(request.method==='HEAD'?null:UI_REPAIR_CSS,{headers:{'content-type':'text/css; charset=utf-8','cache-control':'public, max-age=300','x-content-type-options':'nosniff','x-kader-ui-repair':UI_REPAIR_REV}});
+    }
     if(url.pathname===UI_FIX_PATH){
       if(!['GET','HEAD'].includes(request.method))return portalFailure('Method not allowed',405);
       return new Response(request.method==='HEAD'?null:UI_FIX_CSS,{status:200,headers:{
@@ -147,6 +156,13 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={
       }
       const location=output.get('location');if(location){const next=new URL(location,target);if(next.origin!==target.origin||!next.pathname.startsWith('/mowaqqat/')){await response.body?.cancel();return portalFailure('Unexpected backend redirect',502)}output.set('location',next.pathname+next.search+next.hash)}
       output.set('cache-control','private, no-store');output.set('x-kader-portal-release',PORTAL_RELEASE);output.set('x-content-type-options','nosniff');
+      if(request.method==='GET'&&response.status===200&&/^\/mowaqqat\/(?:app(?:-limited)?|people)\.js$/.test(url.pathname)){
+        const original=await response.text();
+        const repaired=repairPortalAsset(url.pathname,original);
+        output.delete('etag');output.delete('last-modified');
+        if(repaired!==original)output.set('x-kader-ui-repair',UI_REPAIR_REV);
+        return new Response(repaired,{status:200,headers:output});
+      }
       if(request.method==='GET'&&response.status===200&&/text\/html/i.test(output.get('content-type')||'')){
         const upstreamHtml=await response.text();
         const baseHtml=root?upstreamHtml.replace('<head>','<head><base href="/mowaqqat/"><meta name="kader-base-path" content="/mowaqqat">'):upstreamHtml;

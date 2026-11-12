@@ -1,0 +1,96 @@
+/* Kader responsive repair, 2026-11-12. Loaded once after native module styles. */
+body[data-kader-ui] {
+  --kader-ink:#193c30; --kader-muted:#516459; --kader-line:#d7dfd4;
+  --kader-control:#8c9e90; --kader-green-800:#24513d;
+  --kader-gold-300:#e0cc91; --kader-gold-800:#76591f;
+  color:var(--kader-ink); background:#f5f7f3; line-height:1.65;
+}
+body[data-kader-ui] [hidden] { display:none!important; }
+body[data-kader-ui] :is(h1,h2,h3,h4) { letter-spacing:normal; line-height:1.45; }
+body[data-kader-ui] :is(.panel-head,.page-heading) { min-height:0; height:auto; gap:12px; }
+body[data-kader-ui] .panel-head>h2 { flex:1 1 auto; margin:0; font-size:18px; }
+body[data-kader-ui] :is(.panel,.card,.stat-card,.metric) { border-color:#d7dfd4; }
+body[data-kader-ui] :is(.muted,.stat-foot,.entity-sub,.subtitle,.executive-source) { color:#516459; }
+body[data-kader-ui] :is(.pill.red,.badge.red) { color:#972f3e; background:#fce9ed; }
+body[data-kader-ui] :is(.pill.orange,.badge.orange) { color:#775319; background:#faf0d7; }
+body[data-kader-ui] :is(.pill.teal,.pill.green) { color:#1d6346; background:#e4f1e7; }
+body[data-kader-ui] .btn { min-height:44px; color:#fff; background:#24513d; }
+body[data-kader-ui] .btn.ghost { color:#24513d; background:#fff; border-color:#9eaf9e; }
+body[data-kader-ui] .btn.danger { background:#a73546; color:#fff; }
+body[data-kader-ui] .btn.warning { background:#78551e; color:#fff; }
+body[data-kader-ui=portal] .page-inner { padding-block:24px max(32px,env(safe-area-inset-bottom)); }
+.kader-home { display:grid; gap:20px; width:100%; min-width:0; }
+.kader-home>:is(.panel,.stats-grid,.executive-brief) { margin:0; }
+.kader-home .sites-native-cover { min-height:0; padding:24px; gap:16px; border-radius:16px; background:#183e2e; box-shadow:none; }
+body[data-kader-ui=portal] .kader-home .sites-native-cover h1 { font-size:27px; line-height:1.4; }
+.kader-home .sites-native-cover p { margin:8px 0 18px; font-size:14px; line-height:1.6; }
+.kader-home .sites-native-cover .tool-row { margin:0; }
+.kader-home .panel { padding:20px; border-radius:14px; box-shadow:none; }
+.kader-home .panel>.panel-head { margin-bottom:16px; }
+body[data-kader-ui=portal] .kader-home .stat-card { min-height:0; padding:16px; border-radius:12px; box-shadow:none; }
+body[data-kader-ui=portal] .kader-home .stat-icon { position:static; float:inline-end; width:30px; height:30px; margin-inline-start:8px; padding:0; }
+body[data-kader-ui=portal] .kader-home .stat-name { padding:0; max-width:none; font-size:13px; line-height:1.5; }
+body[data-kader-ui=portal] .kader-home .stat-value { margin:8px 0 2px; font-size:30px; line-height:1.2; }
+body[data-kader-ui=portal] .kader-home .stat-foot { margin:0; font-size:12px; line-height:1.5; }
+body[data-kader-ui=portal] .kader-home .hub-grid { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+body[data-kader-ui=portal] .kader-home .hub-card { min-height:0; padding:16px; gap:12px; border-top:1px solid #d7dfd4; border-inline-start:3px solid #b79a53; border-radius:12px; box-shadow:none; }
+body[data-kader-ui=portal] .kader-home .hub-card>svg { width:22px; height:22px; padding:8px; border-radius:10px; }
+body[data-kader-ui=portal] .kader-home .hub-card h2 { min-height:0; margin:0 0 6px; font-size:16px; color:#193c30; }
+body[data-kader-ui=portal] .kader-home .hub-card p { margin:0; flex:none; font-size:13px; line-height:1.65; }
+body[data-kader-ui=portal] .kader-home .hub-card .btn { width:auto; margin:0; font-size:13px; text-align:start; align-self:flex-start; }
+.kader-home .mini-rule { display:block; padding:14px 0; }
+.kader-home .mini-rule p { margin:5px 0 8px; color:#516459; font-size:13px; line-height:1.65; }
+.kader-home .mini-rule .link-button { text-align:start; font-weight:600; color:#193c30; line-height:1.65; padding:0; background:none; border:0; }
+.kader-priority-meta { display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:12px; color:#516459; }
+.kader-home .executive-company-grid { grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px; }
+body[data-kader-ui=portal] .kader-home .executive-company-card { padding:12px; border-radius:10px; }
+.kader-home .executive-source { font-size:12px; line-height:1.65; margin:12px 0 0; padding-top:12px; }
+body[data-kader-ui=portal] #authWall { background:#f5f7f3; display:grid; place-items:center; min-height:100svh; padding:24px 16px; }
+body[data-kader-ui=portal] #authWall.hidden { display:none!important; }
+body[data-kader-ui=portal] #authWall .auth-card { width:min(400px,100%); padding:28px; background:#fff; border:1px solid #d7dfd4; border-top:3px solid #b79a53; border-radius:16px; }
+body[data-kader-ui=portal] #authWall .auth-card:not(:has(form))::after { content:''; display:block; width:22px; height:22px; margin-top:18px; border:3px solid #dfe8df; border-top-color:#24513d; border-radius:50%; animation:kader-load .8s linear infinite; }
+@keyframes kader-load { to { transform:rotate(360deg); } }
+body[data-kader-ui=portal] :is(.icon-top,.square-btn) { background:#f3f6f1; color:#24513d; border-color:#d7dfd4; }
+#kaderHrSuite { font-family:inherit; color:#193c30; }
+#kaderHrSuite .talent-hero { background:#183e2e; }
+#kaderHrSuite .hr-embedded-heading p { color:#516459; }
+#kaderHrSuite .hr-embedded-heading + #kaderHiringPanel>.notice { display:none; }
+#kaderHrSuite .hr-embedded-switch button[aria-pressed=true] { background:#24513d; color:#fff; }
+@media(max-width:760px) {
+  /* A horizontal 220px flex basis became a 220px vertical spacer in column mode. */
+  body[data-kader-ui] :is(.panel-head,.page-heading)>* { flex:0 1 auto; flex-basis:auto; width:auto; min-height:0; }
+  body[data-kader-ui] :is(.panel-head,.page-heading) { flex-direction:row; align-items:center; flex-wrap:wrap; }
+  body[data-kader-ui] .panel-head>h2 { flex:1 1 auto; font-size:17px; }
+  body[data-kader-ui] .panel-head>.head-actions { flex:1 1 100%; width:100%; }
+  body[data-kader-ui=portal] .topbar { display:flex; flex-wrap:nowrap; min-height:64px; height:auto; padding:10px 12px; gap:8px; }
+  body[data-kader-ui=portal] .topbar-start { flex:1 1 auto; width:auto; flex-wrap:nowrap; gap:8px; }
+  body[data-kader-ui=portal] .breadcrumbs { flex:1 1 auto; width:auto; order:0; font-size:13px; }
+  body[data-kader-ui=portal] .mobile-menu { order:0; }
+  body[data-kader-ui=portal] .topbar-actions { flex:0 0 auto; width:auto; gap:6px; flex-wrap:nowrap; }
+  body[data-kader-ui=portal] :is(.topbar-date,.top-divider,#headerActor,.top-profile b,#homeQuickBtn,#syncQuickBtn) { display:none; }
+  body[data-kader-ui=portal] .topbar-actions .top-profile { width:40px; padding:0; min-width:40px; }
+  body[data-kader-ui=portal] .icon-top svg { width:20px; height:20px; }
+  body[data-kader-ui=portal] .page-inner { padding:16px 12px max(28px,env(safe-area-inset-bottom))!important; }
+  .kader-home { gap:16px; }
+  .kader-home .sites-native-cover { padding:18px; }
+  body[data-kader-ui=portal] .kader-home .sites-native-cover h1 { font-size:22px; }
+  .kader-home .sites-native-cover .tool-row>.btn { width:auto; }
+  .kader-home .panel { padding:14px; }
+  body[data-kader-ui=portal] .kader-home .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px!important; }
+  body[data-kader-ui=portal] .kader-home .stat-card { padding:12px; }
+  body[data-kader-ui=portal] .kader-home .stat-value { font-size:27px; }
+  body[data-kader-ui=portal] .kader-home .hub-grid { grid-template-columns:1fr; }
+  body[data-kader-ui=portal] .kader-home .hub-card { display:grid; grid-template-columns:38px minmax(0,1fr); align-items:start; padding:14px; gap:10px; }
+  body[data-kader-ui=portal] .kader-home .hub-card>.btn { grid-column:2; font-size:12px; padding:6px 10px; }
+  body[data-kader-ui=portal] .kader-home .hub-card>svg { padding:7px; }
+  .kader-home .executive-company-grid { grid-template-columns:1fr; }
+  #kaderHrSuite .hr-embedded-heading { gap:12px; margin-bottom:14px; }
+  #kaderHrSuite .section-head>h2 { flex:0 1 auto; }
+}
+@media(max-width:360px) {
+  body[data-kader-ui=portal] .topbar { flex-wrap:wrap; }
+  body[data-kader-ui=portal] .topbar-start { flex-basis:100%; }
+  body[data-kader-ui=portal] .topbar-actions { margin-inline-start:auto; }
+  body[data-kader-ui=portal] .kader-home .stats-grid { grid-template-columns:1fr; }
+}
+@media(prefers-reduced-motion:reduce) { body[data-kader-ui=portal] #authWall .auth-card::after { animation:none!important; } }
