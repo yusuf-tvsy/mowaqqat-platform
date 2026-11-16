@@ -67,6 +67,24 @@ class VerifiedCache:
         self.original_run = original_run
         self.disabled = disabled
 
+    def _installed_snapshot(self, runtime: Path) -> str | None:
+        """Detect package drift that `pip check` alone would not catch."""
+        try:
+            python = _which_interpreter(runtime)
+            result = self.original_run(
+                [str(python), "-m", "pip", "list", "--format=freeze"],
+                capture_output=True, timeout=20, check=False,
+            )
+            output = result.stdout
+            if result.returncode != 0 or not isinstance(output, (bytes, str)) or not output:
+                return None
+            raw = output.encode("utf-8") if isinstance(output, str) else output
+            if len(raw) > 2_000_000:
+                return None
+            return hashlib.sha256(raw).hexdigest()
+        except (OSError, ValueError, subprocess.SubprocessError):
+            return None
+
     def _cache_valid(self, runtime: Path) -> bool:
         marker = runtime / CACHE_NAME
         if not marker.is_file():
@@ -76,12 +94,15 @@ class VerifiedCache:
             if expected is None:
                 return False
             stored = json.loads(marker.read_text(encoding="utf-8"))
-            if stored != expected:
+            if not isinstance(stored, dict):
+                return False
+            saved_snapshot = stored.pop("installed_freeze_sha256", None)
+            if saved_snapshot is None or stored != expected:
                 return False
             python = _which_interpreter(runtime)
             result = self.original_run([str(python), "-m", "pip", "check"],
                                        capture_output=True, timeout=15, check=False)
-            return result.returncode == 0
+            return result.returncode == 0 and self._installed_snapshot(runtime) == saved_snapshot
         except (OSError, ValueError, json.JSONDecodeError, subprocess.SubprocessError):
             return False
 
@@ -89,6 +110,10 @@ class VerifiedCache:
         info = _details(runtime)
         if info is None:
             return
+        snapshot = self._installed_snapshot(runtime)
+        if snapshot is None:
+            return
+        info["installed_freeze_sha256"] = snapshot
         marker = runtime / CACHE_NAME
         tmpname = None
         try:
