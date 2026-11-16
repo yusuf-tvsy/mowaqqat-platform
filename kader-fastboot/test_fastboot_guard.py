@@ -12,12 +12,17 @@ class FakeRunner:
         self.calls = []
         self.pip_check_status = 0
         self.pip_install_status = 0
+        self.installed_packages = b"fastapi==0.128.2\nuvicorn==0.48.0\n"
+        self.pip_freeze_status = 0
 
     def __call__(self, cmd, *args, **kwargs):
         cmd = list(cmd) if isinstance(cmd, (list, tuple)) else cmd
         self.calls.append((cmd, kwargs))
         if isinstance(cmd, list) and cmd[1:4] == ["-m", "pip", "check"]:
             return subprocess.CompletedProcess(cmd, self.pip_check_status)
+        if isinstance(cmd, list) and cmd[1:4] == ["-m", "pip", "list"]:
+            return subprocess.CompletedProcess(cmd, self.pip_freeze_status,
+                                               stdout=self.installed_packages)
         if isinstance(cmd, list) and cmd[1:4] == ["-m", "pip", "install"]:
             return subprocess.CompletedProcess(cmd, self.pip_install_status)
         return subprocess.CompletedProcess(cmd, 0)
@@ -90,6 +95,23 @@ class CachedLaunchTests(unittest.TestCase):
         self.fake.pip_install_status = 1
         result = self.guard.run(self.pip, check=False)
         self.assertEqual(result.returncode, 1)
+        self.assertFalse((self.runtime / CACHE_NAME).exists())
+
+    def test_package_drift_invalidates_cache_even_if_pip_check_passes(self):
+        self.warm_cache()
+        self.fake.installed_packages = b"fastapi==0.127.0\nuvicorn==0.48.0\n"
+        self.guard.run(self.pip, check=True)
+        self.assertEqual(self.fake.count("install"), 2)
+
+    def test_pip_list_failure_forces_regular_install(self):
+        self.warm_cache()
+        self.fake.pip_freeze_status = 1
+        self.guard.run(self.pip, check=True)
+        self.assertEqual(self.fake.count("install"), 2)
+
+    def test_missing_freeze_output_disables_cache(self):
+        self.fake.installed_packages = b""
+        self.guard.run(self.pip, check=True)
         self.assertFalse((self.runtime / CACHE_NAME).exists())
 
     def test_unrelated_commands_always_execute(self):
