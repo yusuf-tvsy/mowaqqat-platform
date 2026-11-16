@@ -1,0 +1,34 @@
+name: Kader gateway QA
+
+on:
+  push:
+    branches:
+      - "fix/kader-safe-read-retry-20261116"
+  pull_request:
+    branches:
+      - "kader-apex-routing-20261020"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gateway-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntax checks
+        run: |
+          node --check kader-apex/gateway.mjs
+          node --check kader-apex/safe-read-retry.mjs
+          node --check kader-apex/ui-repair.mjs
+      - name: Run gateway regressions
+        run: node --test kader-apex/gateway.test.mjs kader-apex/ui-repair.test.mjs kader-apex/safe-read-retry.test.mjs
+      - name: Verify recovery startup script syntax
+        run: python3 -m py_compile kader-apex/startup-repair.py
