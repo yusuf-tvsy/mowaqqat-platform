@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "fix/kader-safe-read-retry-20261116"
+      - "fix/kader-cold-start-gate-20261116"
   pull_request:
     branches:
       - "kader-apex-routing-20261020"
@@ -27,8 +28,9 @@ jobs:
         run: |
           node --check kader-apex/gateway.mjs
           node --check kader-apex/safe-read-retry.mjs
+          node --check kader-apex/cold-start-gate.mjs
           node --check kader-apex/ui-repair.mjs
       - name: Run gateway regressions
-        run: node --test kader-apex/gateway.test.mjs kader-apex/ui-repair.test.mjs kader-apex/safe-read-retry.test.mjs
+        run: node --test kader-apex/gateway.test.mjs kader-apex/ui-repair.test.mjs kader-apex/safe-read-retry.test.mjs kader-apex/cold-start-gate.test.mjs
       - name: Verify recovery startup script syntax
         run: python3 -m py_compile kader-apex/startup-repair.py

@@ -1,6 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {repairPortalAsset,UI_REPAIR_REV,UI_REPAIR_CSS_PATH} from './ui-repair.mjs';
 import {fetchWithSafeReadRetries} from './safe-read-retry.mjs';
+import {createColdStartGate} from './cold-start-gate.mjs';
 const UI_REPAIR_CSS=readFileSync(new URL('./ui-repair.css',import.meta.url),'utf8');
 export const PORTAL_RELEASE='2.8.0';
 export const PORTAL_UPSTREAM='https://mowaqqat-full-production.up.railway.app';
@@ -113,7 +114,8 @@ const PORTAL_HOP=['connection','keep-alive','proxy-authenticate','proxy-authoriz
 function portalFailure(message,status=502){return new Response(JSON.stringify({detail:message}),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}})}
 function portalCookie(value){return (value||'').split(';').map(v=>v.trim()).find(v=>/^mowaqqat_session=[A-Za-z0-9_-]+$/.test(v))||''}
 
-export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={}){
+export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler,coldStartProtection=false}={}){
+  const readiness=coldStartProtection?createColdStartGate({fetcher,healthUrl:PORTAL_UPSTREAM+'/mowaqqat/api/health'}):null;
   const hosts=new Set(allowedHosts||['kader.media','www.kader.media','access.kader.media']);
   return async function portalGateway(request){
     const url=new URL(request.url);
@@ -146,9 +148,14 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={
     const headers=new Headers();for(const h of PORTAL_HEADERS)if(request.headers.has(h))headers.set(h,request.headers.get(h));
     headers.set('accept-encoding','identity');const cookie=portalCookie(request.headers.get('cookie'));if(cookie)headers.set('cookie',cookie);
     try{
+      if(readiness&&['GET','HEAD'].includes(request.method)&&!await readiness.ensureReady()){
+        const busy=portalFailure('خادم كادر يستيقظ حاليًا؛ أعد المحاولة بعد قليل',503);
+        busy.headers.set('retry-after','3');
+        return busy;
+      }
       const options={method:request.method,headers,redirect:'manual',signal:AbortSignal.timeout(90000)};
       if(!['GET','HEAD'].includes(request.method)){const body=await request.arrayBuffer();if(body.byteLength>PORTAL_MAX_BODY)return portalFailure('Request too large',413);options.body=body;}
-      const response=await fetchWithSafeReadRetries({fetcher,url:target.href,options,method:request.method});const output=new Headers(response.headers);for(const h of PORTAL_HOP)output.delete(h);
+      const response=await fetchWithSafeReadRetries({fetcher,url:target.href,options,method:request.method});if(response.status<500)readiness?.markReady();const output=new Headers(response.headers);for(const h of PORTAL_HOP)output.delete(h);
       const cookies=response.headers.getSetCookie?.()||[response.headers.get('set-cookie')].filter(Boolean);output.delete('set-cookie');
       for(const value of cookies)if(/^mowaqqat_session=/.test(value)){
         let scoped=value.replace(/;\s*Domain=[^;]*/ig,'').replace(/;\s*Path=[^;]*/ig,'');scoped+='; Path=/';
@@ -179,7 +186,7 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={
 
 if(typeof Bun!=='undefined'){
   const hosts=[Bun.env.RAILWAY_PUBLIC_DOMAIN,Bun.env.RENDER_EXTERNAL_HOSTNAME,'kader.media','www.kader.media','access.kader.media'].filter(Boolean);
-  Bun.serve({port:Number(Bun.env.PORT||3000),idleTimeout:120,maxRequestBodySize:PORTAL_MAX_BODY,fetch:createPortalGateway({allowedHosts:hosts})});
+  Bun.serve({port:Number(Bun.env.PORT||3000),idleTimeout:120,maxRequestBodySize:PORTAL_MAX_BODY,fetch:createPortalGateway({allowedHosts:hosts,coldStartProtection:true})});
 }
 
 
