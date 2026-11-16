@@ -2,7 +2,7 @@
 
 **Not deployed to Railway.** This is an additive, opt-out-capable optimization candidate for an existing Python launcher. It does not contain the private Kader application source, credentials, database, or attachments.
 
-`fastboot_guard.py` intercepts only recognized `python -m venv` and `python -m pip install -r requirements.txt` subprocess invocations for matched Kader source/runtime folders. It skips work only after a prior successful install, an unchanged requirements hash and Python executable metadata, and a successful `pip check`. Otherwise it runs the original command. Set `KADER_FASTBOOT_DISABLED=1` to disable the optimization.
+`fastboot_guard.py` intercepts only recognized `python -m venv` and `python -m pip install -r requirements.txt` subprocess invocations for matched Kader source/runtime folders. It skips work only after a prior successful install, an unchanged requirements hash and Python executable metadata, a matching `pip list --format=freeze` inventory, and a successful `pip check`. Otherwise it runs the original command. Set `KADER_FASTBOOT_DISABLED=1` to disable the optimization.
 
 `launch_fastboot.py` is a candidate wrapper for the existing release's `start.py`, not a replacement for its content. **Do not use it in production** until the exact current launcher hash and nested subprocess contract have been inspected via authenticated access, the backup is independently recoverable, and a staging restore and real cold-start tests pass.
 
