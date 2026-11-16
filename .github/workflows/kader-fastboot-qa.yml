@@ -1,0 +1,32 @@
+name: Kader FastBoot candidate QA
+
+on:
+  push:
+    branches:
+      - feature/kader-fastboot-guard-20261117
+  pull_request:
+    branches:
+      - kader-apex-routing-20261020
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fastboot-unit:
+    name: FastBoot Python 3.12 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify syntax
+        run: python -m compileall -q kader-fastboot
+      - name: Run isolated unit tests (no Railway data)
+        run: python kader-fastboot/test_fastboot_guard.py
