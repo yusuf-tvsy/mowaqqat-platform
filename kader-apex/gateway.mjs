@@ -1,5 +1,6 @@
 import {readFileSync} from 'node:fs';
 import {repairPortalAsset,UI_REPAIR_REV,UI_REPAIR_CSS_PATH} from './ui-repair.mjs';
+import {fetchWithSafeReadRetries} from './safe-read-retry.mjs';
 const UI_REPAIR_CSS=readFileSync(new URL('./ui-repair.css',import.meta.url),'utf8');
 export const PORTAL_RELEASE='2.8.0';
 export const PORTAL_UPSTREAM='https://mowaqqat-full-production.up.railway.app';
@@ -147,7 +148,7 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler}={
     try{
       const options={method:request.method,headers,redirect:'manual',signal:AbortSignal.timeout(90000)};
       if(!['GET','HEAD'].includes(request.method)){const body=await request.arrayBuffer();if(body.byteLength>PORTAL_MAX_BODY)return portalFailure('Request too large',413);options.body=body;}
-      const response=await fetcher(target.href,options);const output=new Headers(response.headers);for(const h of PORTAL_HOP)output.delete(h);
+      const response=await fetchWithSafeReadRetries({fetcher,url:target.href,options,method:request.method});const output=new Headers(response.headers);for(const h of PORTAL_HOP)output.delete(h);
       const cookies=response.headers.getSetCookie?.()||[response.headers.get('set-cookie')].filter(Boolean);output.delete('set-cookie');
       for(const value of cookies)if(/^mowaqqat_session=/.test(value)){
         let scoped=value.replace(/;\s*Domain=[^;]*/ig,'').replace(/;\s*Path=[^;]*/ig,'');scoped+='; Path=/';
