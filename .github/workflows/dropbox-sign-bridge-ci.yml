@@ -1,0 +1,29 @@
+name: Dropbox Sign bridge CI
+on:
+  push:
+    branches:
+      - feature/kader-dropbox-sign-adapter-20261117
+    paths:
+      - 'integrations/dropbox-sign/**'
+      - '.github/workflows/dropbox-sign-bridge-ci.yml'
+  pull_request:
+    paths:
+      - 'integrations/dropbox-sign/**'
+      - '.github/workflows/dropbox-sign-bridge-ci.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check integrations/dropbox-sign/bridge.mjs
+          node --check integrations/dropbox-sign/server.mjs
+      - name: Test bridge using synthetic events only
+        run: node --test integrations/dropbox-sign/tests/bridge.test.mjs
