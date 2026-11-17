@@ -1,0 +1,32 @@
+name: Documenso integration (isolated) CI
+
+on:
+  push:
+    branches:
+      - feature/kader-documenso-provider-20261117
+    paths:
+      - 'integrations/documenso/**'
+      - '.github/workflows/documenso-integration-ci.yml'
+  pull_request:
+    paths:
+      - 'integrations/documenso/**'
+      - '.github/workflows/documenso-integration-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax
+        run: |
+          node --check integrations/documenso/bridge.mjs
+          node --check integrations/documenso/server.mjs
+      - name: Run synthetic integration tests
+        run: node --test integrations/documenso/tests/bridge.test.mjs
