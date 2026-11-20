@@ -1,0 +1,33 @@
+name: Kader dependency-only Docker build verification
+on:
+  push:
+    branches:
+      - kader-deps-image-20261120
+    paths:
+      - Dockerfile
+      - requirements.txt
+      - .dockerignore
+      - .github/workflows/kader-deps-image-verify.yml
+  workflow_dispatch:
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout dependency-only branch
+        uses: actions/checkout@v4
+      - name: Verify no application files in Docker context
+        shell: bash
+        run: |
+          test -f Dockerfile
+          test -f requirements.txt
+          test -f .dockerignore
+          ! test -f server/main.py
+          ! test -f .env
+      - name: Build dependency Docker image
+        run: docker build --pull --progress=plain -t kader-python-deps:ci .
+      - name: Verify Python dependencies and marker in built image
+        run: |
+          docker run --rm kader-python-deps:ci python -m pip check
+          docker run --rm kader-python-deps:ci python -c "import os, fastapi, uvicorn, sqlalchemy, psycopg, boto3, pypdf, defusedxml, PIL, uvloop, httptools, watchfiles; assert os.environ['KADER_PREBUILT_REQUIREMENTS_SHA256']=='5063ed0220a0a5bcd317ecc741b4ef842b4746286217c8e1e8bd054003cca129'; print('KADER_DEPS_IMAGE_VERIFIED')"
