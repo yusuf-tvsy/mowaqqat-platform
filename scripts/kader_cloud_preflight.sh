@@ -12,7 +12,10 @@ railway ssh -p "$KADER_PROJECT_ID" -s "$KADER_SERVICE_ID" -e production -i "$KEY
   test -d /data || { echo "Mount /data is missing"; exit 2; }
   echo "Volume mount /data found"
   echo "Release files (names only):"
-  find /data/kader-releases -maxdepth 2 -type f \( -name start.py -o -name index.html \) 2>/dev/null | head -n 35 || true
-  echo "Free disk capacity:"
+  find /data/kader-releases -maxdepth 3 -type f \( -name launch.py -o -name start.py -o -name index.html \) 2>/dev/null | head -n 35 || true
+  echo "Volume capacity (read-only):"
   df -h /data | tail -n 1
+  echo "Largest top-level directories, KiB (read-only):"
+  du -sk /data/* 2>/dev/null | sort -nr | head -n 12 || true
+  echo "This is not a backup or a restoration test. Do not prune files before offsite backup verification."
 '
