@@ -1,0 +1,17 @@
+# Never commit production data, credentials or backups
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.dpapi
+*.pem
+private/
+backups/
+_backup/
+.env
+.env.*

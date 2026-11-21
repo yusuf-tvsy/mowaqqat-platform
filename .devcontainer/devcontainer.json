@@ -1,0 +1,8 @@
+{
+  "name": "Kader Cloud Deployment — Safe Preflight",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "postCreateCommand": "npm install -g @railway/cli",
+  "customizations": {
+    "vscode": { "extensions": ["ms-python.python"] }
+  }
+}
