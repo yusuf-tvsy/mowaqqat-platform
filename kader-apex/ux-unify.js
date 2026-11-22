@@ -62,6 +62,20 @@
         if (element.isConnected) element.click();
       } });
     }
+    const tabs = document.querySelectorAll(
+      '[role="tab"], .tabs button, .tabbar button, .nav-tabs button'
+    );
+    const seenTabs = new Set();
+    for (const element of tabs) {
+      if (!isAllowed(element) || element.disabled || seenTabs.has(element)) continue;
+      const label = (element.getAttribute("aria-label") || element.textContent || "")
+        .replace(/\s+/g, " ").trim().slice(0, 72);
+      if (!label) continue;
+      seenTabs.add(element);
+      items.push({ label, kind: "تبويب", activate: () => {
+        if (element.isConnected) element.click();
+      } });
+    }
     const sections = document.querySelectorAll(
       ".page-inner h2, .page-inner h3, main h2, main h3"
     );
