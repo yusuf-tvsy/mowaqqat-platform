@@ -308,3 +308,53 @@ body[data-kader-ui="portal"][data-kader-density="compact"] :is(th,td) {
   body[data-kader-ui="portal"] .kader-ux-dialog::backdrop { backdrop-filter: none; }
   body[data-kader-ui="portal"] * { scroll-behavior: auto !important; }
 }
+
+
+/* Login and utility pages share the same restrained visual language.
+   This intentionally does not alter authentication behavior or input values. */
+body[data-kader-ui="auth"] {
+  --kader-ux-primary: #24513d;
+  --kader-ux-primary-deep: #153b2e;
+  --kader-ux-gold: #b79a53;
+  --kader-ux-border: #d7dfd4;
+  color: #193c30;
+  background: #f5f7f3;
+}
+body[data-kader-ui="auth"] .auth-wall {
+  min-height: 100svh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+body[data-kader-ui="auth"] .auth-card {
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  max-width: 100%;
+  border: 1px solid #d7dfd4;
+  border-top: 3px solid #b79a53;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(13, 50, 34, .06);
+}
+body[data-kader-ui="auth"] :is(input,select,.password-toggle,.btn[type="submit"]) {
+  min-height: 44px;
+  max-width: 100%;
+}
+body[data-kader-ui="auth"] :is(input,select,.password-toggle,.btn):focus-visible {
+  outline: 3px solid #95712a;
+  outline-offset: 2px;
+}
+@media (max-width: 460px) {
+  body[data-kader-ui="auth"] .auth-card {
+    width: 100%;
+    padding: 22px 18px;
+  }
+}
+/* Shared passive layout safeguards for other identity-labelled utility pages. */
+body[data-kader-ui] :is(.page-inner,.panel,.card,.table-wrap,.table-scroll) {
+  box-sizing: border-box;
+  min-width: 0;
+}
+body[data-kader-ui] :is(.table-wrap,.table-scroll) {
+  max-width: 100%;
+  overflow-x: auto;
+}
