@@ -1,0 +1,27 @@
+name: Kader UX gateway regression checks
+on:
+  push:
+    branches:
+      - feature/kader-ux-unify-20261122
+  pull_request:
+    branches:
+      - kader-apex-routing-20261020
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ux-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check kader-apex/gateway.mjs
+          node --check kader-apex/ux-unify.js
+          node --check kader-apex/ux-unify.test.mjs
+      - name: Test gateway asset routing and API integrity
+        run: node --test kader-apex/ux-unify.test.mjs
