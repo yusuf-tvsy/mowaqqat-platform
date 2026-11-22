@@ -1,0 +1,360 @@
+/* Kader UX unification / 2026-11-22.
+   Conservative, reversible presentation layer; scoped to existing page identity. */
+body[data-kader-ui="portal"] {
+  --kader-ux-primary: #24513d;
+  --kader-ux-primary-deep: #153b2e;
+  --kader-ux-gold: #b79a53;
+  --kader-ux-text: #193c30;
+  --kader-ux-muted: #516459;
+  --kader-ux-border: #d7dfd4;
+  --kader-ux-surface: #fff;
+  --kader-ux-radius: 13px;
+  --kader-ux-focus: #95712a;
+}
+body[data-kader-ui="portal"] :is(.page-inner,.main-content,.content-shell) {
+  min-width: 0;
+  box-sizing: border-box;
+}
+body[data-kader-ui="portal"] .page-inner {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+}
+body[data-kader-ui="portal"] :is(.panel,.card,.stat-card,.hub-card) {
+  min-width: 0;
+  border-radius: var(--kader-ux-radius);
+}
+body[data-kader-ui="portal"] :is(.panel-head,.page-heading,.head-actions,.tool-row,.filters,.filter-row,.toolbar,.task-flow-toolbar) {
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  column-gap: 12px;
+}
+body[data-kader-ui="portal"] :is(.panel-head,.page-heading) > :is(h1,h2,h3) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  margin-block: 0;
+  line-height: 1.5;
+}
+body[data-kader-ui="portal"] :is(.stats-grid,.hub-grid,.form-grid,.layout-grid,.cards-grid,.grid) > * {
+  min-width: 0;
+}
+body[data-kader-ui="portal"] :is(.table-wrap,.table-scroll,.table-container) {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+body[data-kader-ui="portal"] :is(.tabs,.tabbar,.nav-tabs,[role="tablist"]) {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+body[data-kader-ui="portal"] :is(.tab,[role="tab"]) {
+  min-height: 40px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+body[data-kader-ui="portal"] :is(input,select,textarea) {
+  min-width: 0;
+  max-width: 100%;
+  font: inherit;
+}
+body[data-kader-ui="portal"] :is(button,a,input,select,textarea,summary,[role="tab"]):focus-visible {
+  outline: 3px solid var(--kader-ux-focus);
+  outline-offset: 3px;
+}
+body[data-kader-ui="portal"] :is(.modal-content,.dialog-content,.popover-content) {
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
+}
+body[data-kader-ui="portal"] :is(.empty-state,.no-results) {
+  line-height: 1.8;
+}
+body[data-kader-ui="portal"] :is(.page-inner,.panel,.card) p {
+  overflow-wrap: anywhere;
+}
+
+/* One discreet launcher; presentation only. Does not replace native navigation. */
+body[data-kader-ui="portal"] .kader-ux-launcher {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 7px 13px;
+  border: 1px solid #a3b4a7;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--kader-ux-primary-deep);
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+}
+body[data-kader-ui="portal"] .kader-ux-launcher:hover {
+  background: #edf4ed;
+  border-color: #719681;
+}
+body[data-kader-ui="portal"] .kader-ux-launcher-icon {
+  font-family: inherit;
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* The native dialog forms a keyboard-accessible popup and traps focus. */
+body[data-kader-ui="portal"] .kader-ux-dialog {
+  color: var(--kader-ux-text);
+  background: var(--kader-ux-surface);
+  width: min(650px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: min(82dvh, 780px);
+  padding: 0;
+  border: 1px solid var(--kader-ux-border);
+  border-top: 4px solid var(--kader-ux-gold);
+  border-radius: 16px;
+  box-shadow: 0 20px 65px rgba(8, 35, 25, .22);
+  overflow: auto;
+  box-sizing: border-box;
+  text-align: start;
+}
+body[data-kader-ui="portal"] .kader-ux-dialog::backdrop {
+  background: rgba(12, 31, 25, .58);
+  backdrop-filter: blur(2px);
+}
+body[data-kader-ui="portal"] .kader-ux-dialog-content {
+  padding: 22px;
+  display: grid;
+  gap: 14px;
+}
+body[data-kader-ui="portal"] .kader-ux-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+body[data-kader-ui="portal"] .kader-ux-dialog-heading h2 {
+  margin: 0;
+  color: var(--kader-ux-primary-deep);
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+body[data-kader-ui="portal"] .kader-ux-close {
+  min-height: 42px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  color: var(--kader-ux-text);
+  border: 1px solid var(--kader-ux-border);
+  background: #f7f9f6;
+  cursor: pointer;
+  font: inherit;
+}
+body[data-kader-ui="portal"] .kader-ux-description,
+body[data-kader-ui="portal"] .kader-ux-count {
+  margin: 0;
+  color: var(--kader-ux-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+body[data-kader-ui="portal"] .kader-ux-search {
+  width: 100%;
+  padding: 12px 14px;
+  min-height: 46px;
+  background: #fff;
+  border: 1px solid #a3b4a7;
+  border-radius: 10px;
+  color: var(--kader-ux-text);
+  font: inherit;
+}
+body[data-kader-ui="portal"] .kader-ux-search:focus {
+  border-color: var(--kader-ux-primary);
+}
+body[data-kader-ui="portal"] .kader-ux-settings {
+  border: 1px solid var(--kader-ux-border);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: #fafbf9;
+}
+body[data-kader-ui="portal"] .kader-ux-settings summary {
+  padding-block: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--kader-ux-primary-deep);
+}
+body[data-kader-ui="portal"] .kader-ux-density {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 2px 0 13px;
+}
+body[data-kader-ui="portal"] .kader-ux-density-choice {
+  border: 1px solid #9eaf9e;
+  background: #fff;
+  color: var(--kader-ux-primary-deep);
+  padding: 8px 12px;
+  min-height: 42px;
+  border-radius: 9px;
+  cursor: pointer;
+  font: inherit;
+}
+body[data-kader-ui="portal"] .kader-ux-density-choice[aria-pressed="true"] {
+  background: var(--kader-ux-primary);
+  border-color: var(--kader-ux-primary);
+  color: #fff;
+}
+body[data-kader-ui="portal"] .kader-ux-results {
+  min-height: 96px;
+  max-height: min(42dvh, 350px);
+  overflow-y: auto;
+}
+body[data-kader-ui="portal"] .kader-ux-results-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+body[data-kader-ui="portal"] .kader-ux-result-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 45px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid #e1e7dd;
+  background: #fff;
+  color: var(--kader-ux-primary-deep);
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+}
+body[data-kader-ui="portal"] .kader-ux-result-button:hover,
+body[data-kader-ui="portal"] .kader-ux-result-button:focus-visible {
+  background: #edf4ed;
+  border-color: #719681;
+}
+body[data-kader-ui="portal"] .kader-ux-result-label {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+body[data-kader-ui="portal"] .kader-ux-result-kind {
+  color: var(--kader-ux-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Optional user-selected compact density: no content is ever hidden. */
+body[data-kader-ui="portal"][data-kader-density="compact"] .page-inner {
+  padding-block: 14px 22px;
+}
+body[data-kader-ui="portal"][data-kader-density="compact"] :is(.panel,.card) {
+  padding: 14px;
+}
+body[data-kader-ui="portal"][data-kader-density="compact"] :is(.panel-head,.page-heading) {
+  margin-block-end: 10px;
+}
+body[data-kader-ui="portal"][data-kader-density="compact"] :is(.stats-grid,.hub-grid) {
+  gap: 10px;
+}
+body[data-kader-ui="portal"][data-kader-density="compact"] :is(th,td) {
+  padding-block: 8px;
+}
+@media (max-width: 760px) {
+  body[data-kader-ui="portal"] .kader-ux-launcher {
+    width: 44px;
+    min-width: 44px;
+    padding: 6px;
+  }
+  body[data-kader-ui="portal"] .kader-ux-launcher-label {
+    display: none;
+  }
+  body[data-kader-ui="portal"] .kader-ux-dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 88dvh;
+    margin: auto 0 0;
+    border-radius: 16px 16px 0 0;
+  }
+  body[data-kader-ui="portal"] .kader-ux-dialog-content {
+    padding: 18px 14px max(20px,env(safe-area-inset-bottom));
+  }
+  body[data-kader-ui="portal"] .kader-ux-dialog-heading h2 {
+    font-size: 19px;
+  }
+  body[data-kader-ui="portal"] .kader-ux-results {
+    max-height: 38dvh;
+  }
+  body[data-kader-ui="portal"] :is(.filter-row,.filters,.head-actions) {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 380px) {
+  body[data-kader-ui="portal"] .kader-ux-result-button {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-kader-ui="portal"] .kader-ux-dialog::backdrop { backdrop-filter: none; }
+  body[data-kader-ui="portal"] * { scroll-behavior: auto !important; }
+}
+
+
+/* Login and utility pages share the same restrained visual language.
+   This intentionally does not alter authentication behavior or input values. */
+body[data-kader-ui="auth"] {
+  --kader-ux-primary: #24513d;
+  --kader-ux-primary-deep: #153b2e;
+  --kader-ux-gold: #b79a53;
+  --kader-ux-border: #d7dfd4;
+  color: #193c30;
+  background: #f5f7f3;
+}
+body[data-kader-ui="auth"] .auth-wall {
+  min-height: 100svh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+body[data-kader-ui="auth"] .auth-card {
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  max-width: 100%;
+  border: 1px solid #d7dfd4;
+  border-top: 3px solid #b79a53;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(13, 50, 34, .06);
+}
+body[data-kader-ui="auth"] :is(input,select,.password-toggle,.btn[type="submit"]) {
+  min-height: 44px;
+  max-width: 100%;
+}
+body[data-kader-ui="auth"] :is(input,select,.password-toggle,.btn):focus-visible {
+  outline: 3px solid #95712a;
+  outline-offset: 2px;
+}
+@media (max-width: 460px) {
+  body[data-kader-ui="auth"] .auth-card {
+    width: 100%;
+    padding: 22px 18px;
+  }
+}
+/* Shared passive layout safeguards for other identity-labelled utility pages. */
+body[data-kader-ui] :is(.page-inner,.panel,.card,.table-wrap,.table-scroll) {
+  box-sizing: border-box;
+  min-width: 0;
+}
+body[data-kader-ui] :is(.table-wrap,.table-scroll) {
+  max-width: 100%;
+  overflow-x: auto;
+}
