@@ -23,5 +23,8 @@ jobs:
           node --check kader-apex/gateway.mjs
           node --check kader-apex/ux-unify.js
           node --check kader-apex/ux-unify.test.mjs
-      - name: Test gateway asset routing and API integrity
-        run: node --test kader-apex/ux-unify.test.mjs
+          node --check kader-apex/ux-unify.dom.test.mjs
+      - name: Install isolated synthetic-DOM test harness
+        run: npm install --no-save --no-package-lock --ignore-scripts jsdom@26
+      - name: Test gateway and interactive UI behavior
+        run: node --test kader-apex/ux-unify.test.mjs kader-apex/ux-unify.dom.test.mjs
