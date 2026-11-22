@@ -60,6 +60,8 @@ test("portal quick-navigation opens and follows existing native tab click", asyn
   matching.click();
   assert.equal(tabsSelected, 1);
   assert.equal(dialog.open, false);
+  await tick();
+  dom.window.dispatchEvent(new dom.window.Event("pagehide"));
   dom.window.close();
 });
 
@@ -77,6 +79,8 @@ test("compact density is optional, accessible and browser-local", async () => {
   const relaxed = doc.querySelector('[data-kader-density-choice="comfortable"]');
   relaxed.click();
   assert.equal(doc.body.dataset.kaderDensity, "comfortable");
+  await tick();
+  dom.window.dispatchEvent(new dom.window.Event("pagehide"));
   dom.window.close();
 });
 
@@ -86,6 +90,8 @@ test("login page does not get navigation controls", async () => {
   await tick();
   assert.equal(doc.querySelector("[data-kader-ux-launcher]"), null);
   assert.equal(doc.getElementById("kader-ux-quick-dialog"), null);
+  await tick();
+  dom.window.dispatchEvent(new dom.window.Event("pagehide"));
   dom.window.close();
 });
 
@@ -102,6 +108,8 @@ test("new topbars after SPA rerender get exactly one launcher", async () => {
   assert.equal(next.querySelectorAll("[data-kader-ux-launcher]").length, 1);
   await tick();
   assert.equal(next.querySelectorAll("[data-kader-ux-launcher]").length, 1);
+  await tick();
+  dom.window.dispatchEvent(new dom.window.Event("pagehide"));
   dom.window.close();
 });
 
@@ -115,5 +123,7 @@ test("Ctrl+K opens native dialog and Escape remains a browser dialog behavior", 
   doc.dispatchEvent(e);
   assert.equal(e.defaultPrevented, true);
   assert.equal(doc.getElementById("kader-ux-quick-dialog").open, true);
+  await tick();
+  dom.window.dispatchEvent(new dom.window.Event("pagehide"));
   dom.window.close();
 });
