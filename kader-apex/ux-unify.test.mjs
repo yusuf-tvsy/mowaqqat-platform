@@ -43,12 +43,13 @@ test("rendered portal gets exactly one CSS and one deferred JS enhancement", asy
   assert.equal(response.headers.get("x-kader-ui-fix"), "20261110.v1");
 });
 
-test("anonymous login is not modified with the authenticated quick-navigation UI", async () => {
+test("login receives the scoped shared stylesheet, but no authenticated UI script", async () => {
   const {handler} = mockGateway(auth);
   const html = await (await handler(new Request("https://kader.media/mowaqqat/"))).text();
-  assert.ok(!html.includes("data-kader-ux-css"));
+  assert.ok(html.includes("data-kader-ux-css"));
   assert.ok(!html.includes("data-kader-ux-script"));
   assert.match(html, /data-kader-ui='auth'/);
+  assert.match(css, /data-kader-ui="auth"/);
 });
 
 test("the two public UX assets are safe read-only same-origin routes", async () => {
@@ -98,4 +99,12 @@ test("foreign host is rejected before asset routing", async () => {
   const {handler} = mockGateway(portal);
   const r = await handler(new Request("https://example.org/_kader/ux-unify-20261122.js"));
   assert.equal(r.status, 421);
+});
+
+test("standalone identity-labelled utility page gets theme CSS but no navigation overlay", async () => {
+  const page = "<html><head></head><body data-kader-ui='hr'><div class='panel'></div></body></html>";
+  const {handler} = mockGateway(page);
+  const html = await (await handler(new Request("https://kader.media/mowaqqat/hr.html"))).text();
+  assert.ok(html.includes("data-kader-ux-css"));
+  assert.ok(!html.includes("data-kader-ux-script"));
 });
