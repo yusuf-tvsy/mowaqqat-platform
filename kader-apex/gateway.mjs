@@ -3,6 +3,11 @@ import {repairPortalAsset,UI_REPAIR_REV,UI_REPAIR_CSS_PATH} from './ui-repair.mj
 import {fetchWithSafeReadRetries} from './safe-read-retry.mjs';
 import {createColdStartGate} from './cold-start-gate.mjs';
 const UI_REPAIR_CSS=readFileSync(new URL('./ui-repair.css',import.meta.url),'utf8');
+const UX_UNIFY_CSS=readFileSync(new URL('./ux-unify.css',import.meta.url),'utf8');
+const UX_UNIFY_JS=readFileSync(new URL('./ux-unify.js',import.meta.url),'utf8');
+const UX_UNIFY_CSS_PATH='/_kader/ux-unify-20261122.css';
+const UX_UNIFY_JS_PATH='/_kader/ux-unify-20261122.js';
+const UX_UNIFY_REV='20261122.1';
 export const PORTAL_RELEASE='2.8.0';
 export const PORTAL_UPSTREAM='https://mowaqqat-full-production.up.railway.app';
 const UI_FIX_PATH='/_kader/ui-correction-20261110.css';
@@ -105,6 +110,10 @@ function attachUiFix(html){
   if(typeof html!=='string')return html;
   if(!html.includes(`data-kader-ui-fix="${UI_FIX_REV}"`))html=html.replace(/<\/head>/i,UI_FIX_LINK+'</head>');
   if(!html.includes(`data-kader-ui-repair="${UI_REPAIR_REV}"`))html=html.replace(/<\/head>/i,`<link rel="stylesheet" href="${UI_REPAIR_CSS_PATH}" data-kader-ui-repair="${UI_REPAIR_REV}"></head>`);
+  if(/\bdata-kader-ui\s*=\s*["']?portal\b/i.test(html)){
+    if(!html.includes(`data-kader-ux-css="${UX_UNIFY_REV}"`))html=html.replace(/<\/head>/i,`<link rel="stylesheet" href="${UX_UNIFY_CSS_PATH}" data-kader-ux-css="${UX_UNIFY_REV}"></head>`);
+    if(!html.includes(`data-kader-ux-script="${UX_UNIFY_REV}"`))html=html.replace(/<\/body>/i,`<script src="${UX_UNIFY_JS_PATH}" defer data-kader-ux-script="${UX_UNIFY_REV}"></script></body>`);
+  }
   return html;
 }
 const PORTAL_MAX_BODY=52*1024*1024;
@@ -121,6 +130,15 @@ export function createPortalGateway({allowedHosts,fetcher=fetch,legacyHandler,co
     const url=new URL(request.url);
     if(!hosts.has(url.hostname.toLowerCase()))return portalFailure('Unrecognized host',421);
     if(url.pathname==='/_portal/health')return Response.json({status:'ok',service:'kader-portal',release:PORTAL_RELEASE},{headers:{'cache-control':'no-store'}});
+    if(url.pathname===UX_UNIFY_CSS_PATH||url.pathname===UX_UNIFY_JS_PATH){
+      if(!['GET','HEAD'].includes(request.method))return portalFailure('Method not allowed',405);
+      const isStyle=url.pathname===UX_UNIFY_CSS_PATH;
+      return new Response(request.method==='HEAD'?null:(isStyle?UX_UNIFY_CSS:UX_UNIFY_JS),{status:200,headers:{
+        'content-type':isStyle?'text/css; charset=utf-8':'text/javascript; charset=utf-8',
+        'cache-control':'public, max-age=300','x-content-type-options':'nosniff',
+        'x-kader-ux-revision':UX_UNIFY_REV,
+      }});
+    }
     if(url.pathname===UI_REPAIR_CSS_PATH){
       if(!['GET','HEAD'].includes(request.method))return portalFailure('Method not allowed',405);
       return new Response(request.method==='HEAD'?null:UI_REPAIR_CSS,{headers:{'content-type':'text/css; charset=utf-8','cache-control':'public, max-age=300','x-content-type-options':'nosniff','x-kader-ui-repair':UI_REPAIR_REV}});
