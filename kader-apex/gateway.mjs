@@ -110,8 +110,11 @@ function attachUiFix(html){
   if(typeof html!=='string')return html;
   if(!html.includes(`data-kader-ui-fix="${UI_FIX_REV}"`))html=html.replace(/<\/head>/i,UI_FIX_LINK+'</head>');
   if(!html.includes(`data-kader-ui-repair="${UI_REPAIR_REV}"`))html=html.replace(/<\/head>/i,`<link rel="stylesheet" href="${UI_REPAIR_CSS_PATH}" data-kader-ui-repair="${UI_REPAIR_REV}"></head>`);
-  if(/\bdata-kader-ui\s*=\s*["']?portal\b/i.test(html)){
+  // The shared stylesheet covers all identity-labelled pages; interactions are portal-only.
+  if(/\bdata-kader-ui\s*=\s*["']?[a-z][\w-]*\b/i.test(html)){
     if(!html.includes(`data-kader-ux-css="${UX_UNIFY_REV}"`))html=html.replace(/<\/head>/i,`<link rel="stylesheet" href="${UX_UNIFY_CSS_PATH}" data-kader-ux-css="${UX_UNIFY_REV}"></head>`);
+  }
+  if(/\bdata-kader-ui\s*=\s*["']?portal\b/i.test(html)){
     if(!html.includes(`data-kader-ux-script="${UX_UNIFY_REV}"`))html=html.replace(/<\/body>/i,`<script src="${UX_UNIFY_JS_PATH}" defer data-kader-ux-script="${UX_UNIFY_REV}"></script></body>`);
   }
   return html;
