@@ -91,7 +91,10 @@ body[data-kader-ui="portal"] .kader-ux-launcher {
   background: #fff;
   color: var(--kader-ux-primary-deep);
   box-shadow: none;
-  font: 600 13px/1.4 inherit;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
   cursor: pointer;
 }
 body[data-kader-ui="portal"] .kader-ux-launcher:hover {
@@ -138,7 +141,10 @@ body[data-kader-ui="portal"] .kader-ux-dialog-heading {
 body[data-kader-ui="portal"] .kader-ux-dialog-heading h2 {
   margin: 0;
   color: var(--kader-ux-primary-deep);
-  font: 700 21px/1.5 inherit;
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
 }
 body[data-kader-ui="portal"] .kader-ux-close {
   min-height: 42px;
