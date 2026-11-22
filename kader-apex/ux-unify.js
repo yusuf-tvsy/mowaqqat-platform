@@ -8,6 +8,7 @@
   const STORAGE_KEY = "kader.ux.density.v1";
   let dialog, searchInput, results, sourceButton;
   let scheduled = false;
+  let stopped = false;
 
   const isPortal = () => document.body?.dataset.kaderUi === "portal";
   const byId = id => document.getElementById(id);
@@ -43,7 +44,9 @@
   function isAllowed(element) {
     return element.isConnected
       && !element.closest("[hidden], [aria-hidden='true'], .hidden")
-      && element.getAttribute("aria-disabled") !== "true";
+      && element.getAttribute("aria-disabled") !== "true"
+      && window.getComputedStyle(element).display !== "none"
+      && window.getComputedStyle(element).visibility !== "hidden";
   }
   function findTargets() {
     const items = [], seen = new Set();
@@ -54,6 +57,7 @@
       if (!isAllowed(element)) continue;
       const key = element.getAttribute("data-nav");
       if (!key || !/^[a-z0-9_-]{1,80}$/i.test(key) || seen.has(key)) continue;
+      if (/^(logout|signout|sign-out|delete|remove)$/i.test(key)) continue;
       const label = (element.getAttribute("aria-label") || element.textContent || "")
         .replace(/\s+/g, " ").trim().slice(0, 72);
       if (!label) continue;
@@ -220,9 +224,9 @@
     host.appendChild(button);
   }
   function scheduleSync() {
-    if (scheduled) return;
+    if (scheduled || stopped) return;
     scheduled = true;
-    queueMicrotask(() => { scheduled = false; sync(); });
+    queueMicrotask(() => { scheduled = false; if (!stopped) sync(); });
   }
   document.addEventListener("keydown", event => {
     if (!isPortal() || event.defaultPrevented) return;
@@ -234,10 +238,15 @@
   });
   function boot() {
     sync();
-    new MutationObserver(scheduleSync).observe(document.body, {
+    const observer = new MutationObserver(scheduleSync);
+    observer.observe(document.body, {
       childList: true, subtree: true, attributes: true,
       attributeFilter: ["data-kader-ui"],
     });
+    window.addEventListener("pagehide", () => {
+      stopped = true;
+      observer.disconnect();
+    }, {once: true});
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot, { once: true });
